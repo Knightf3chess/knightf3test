@@ -1,0 +1,41 @@
+<link rel="stylesheet" href="live.css">
+<div id="twitch-embed"></div>
+</div>
+
+
+
+
+
+<body>
+  <div class="container">
+    <div class="side-menu">
+      <div class="logo">
+        <img src="https://i.ibb.co/4fh6BkW/fl-conf-ecp013-00017.png" alt="Chess Logo">
+      </div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="bot.html">Bot</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="learn.html">Learn</a></li>
+        <li><a href="vsfriend.html">VS Friend</a></li>
+        <li><a href="form.html">Form</a></li>
+        <li><a href="live.html">Live</a></li>
+        <li><a href="streamers.html">Streamers</a></li>
+      </ul>
+
+
+<!-- Load the Twitch embed JavaScript file -->
+<script src="https://embed.twitch.tv/embed/v1.js"></script>
+
+<!-- Create a Twitch.Embed object that will render within the "twitch-embed" element -->
+<script type="text/javascript">
+new Twitch.Embed("twitch-embed", {
+  width: 1200,
+  height: 700,
+  channel: "monstercat",
+  // Only needed if this page is going to be embedded on other websites
+  parent: ["embed.example.com", "othersite.example.com"]
+});
+</script>
+</body>
+</html>

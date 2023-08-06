@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!DOCTYPE html>
+    <html>
+        <div style="margin: 200px;"></div>
+
+
+    
+    
+    <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width">
+          <title>Chess</title>
+          <link href="vsfriend.css" rel="stylesheet" type="text/css" />
+    </head>
+    
+    <body>
+        <h2>VS Friend</h2>
+        <div id='options_container'>
+            <div class='option-container'>
+                Game Mode: 
+                <select id='game-option'>
+                    <option value='standard'>Standard</option>
+                    <option value='custom'>Custom Starting Position</option>
+                </select>
+            </div>
+    
+            <div id='start-fen' class='option-container' hidden>
+                <input id='start-fen-input' type='text' placeholder='Enter FEN'>
+            </div>
+    
+            <div class='option-container'>
+                Time control: 
+                <select id='time-option'>
+                    <option value='unlimited'>Unlimited</option>
+                    <option value='real-time'>Real Time</option>
+                </select>
+            </div>
+            
+            <div class="slidecontainer" hidden>
+              <p>Minutes per side: <span id="minuteValue">10</span></p>
+              <input type="range" min="1" max="180" value="10" class="slider" id="minuteRange">
+            </div>
+            <div class="slidecontainer" hidden>
+              <p>Increment seconds: <span id="incrementValue">10</span></p>
+              <input type="range" min="0" max="60" value="10" class="slider" id="incrementRange">
+            </div>
+            
+            <div id='fen-options'></div>
+            <div class='start-btn no-select' onclick='startGame()'>Start</div>
+        </div>
+    
+        
+        <div id='chess-container' hidden>
+            
+            <div id='board'></div>
+            
+            <div id='game-info-container'>
+                <div id='timer-container' hidden>
+                    <div id='black-timer' class='timer'></div>
+                    <div id='white-timer' class='timer'></div>
+                </div>
+                <div id='pieces-captured'>
+                    <div id='w-pieces-captured' class='pieces-captured no-select'></div>
+                    <div id='b-pieces-captured' class='pieces-captured no-select'></div>
+                </div>
+                <div id='share-fen' hidden>a</div>
+                <div id='move-container'></div>
+            </div>
+        </div>
+        <div id='pawn-promotion'></div>
+        
+    
+        <audio src="audio/chess_move.wav"></audio>
+    
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+        <script src="jquery.ui.touch-punch.min.js"></script>
+        <script src="audioControl.js"></script>
+        <script src="chessPieces.js"></script>
+        <script src="moveTranslator.js"></script>
+        <script src="chessBoard.js"></script>
+        <script src="chessTimer.js"></script>
+        <script src="chessTimerManager.js"></script>
+          <script src="script.js"></script>
+    </body>
+    
+    </html>
+
+
+
+
+
+    <body>
+        <div class="container">
+          <div class="side-menu">
+            <div class="logo">
+              <img src="https://i.ibb.co/4fh6BkW/fl-conf-ecp013-00017.png" alt="Chess Logo">
+            </div>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="bot.html">Bot</a></li>
+              <li><a href="analytics.html">Analytics</a></li>
+              <li><a href="learn.html">Learn</a></li>
+              <li><a href="vsfriend.html">VS Friend</a></li>
+              <li><a href="News.html">News</a></li>
+              <li><a href="live.html">Live</a></li>
+              <li><a href="streamers.html">Streamers</a></li>
+            </ul>

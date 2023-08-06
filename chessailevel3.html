@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game</title>
+    <link rel="stylesheet" href="https://unpkg.com/chessboardjs/dist/chessboard.min.css">
+    <link rel="stylesheet" href="analytics.css">
+</head>
+<body>
+    <div id="board" style="width: 400px"></div>
+
+    <script src="https://unpkg.com/chess.js"></script>
+    <script src="https://unpkg.com/chessboardjs/dist/chessboard.min.js"></script>
+    <script>
+        const game = new Chess();
+        let board;
+
+        // Function to handle user move
+        function handleUserMove(source, target) {
+            const move = game.move({ from: source, to: target });
+
+            if (move === null) return 'snapback'; // Invalid move, return the piece to its original position
+
+            // Check game over conditions
+            if (game.in_checkmate()) {
+                alert('Game over: Checkmate!');
+            } else if (game.in_draw()) {
+                alert('Game over: Draw!');
+            }
+
+            // Make the AI move after the user's move
+            setTimeout(makeAIMove, 500);
+        }
+
+        // Function to make the AI move
+        function makeAIMove() {
+            const moves = game.moves();
+            const randomMove = moves[Math.floor(Math.random() * moves.length)];
+            game.move(randomMove);
+            board.position(game.fen());
+
+            // Check game over conditions
+            if (game.in_checkmate()) {
+                alert('Game over: Checkmate!');
+            } else if (game.in_draw()) {
+                alert('Game over: Draw!');
+            }
+        }
+
+        // Initialize the chessboard
+        function initializeChessboard() {
+            const onDragStart = function (source, piece) {
+                // Do not allow dragging if it's not the user's turn or if the game is over
+                if (game.game_over() || piece.search(/^b/) !== -1) {
+                    return false;
+                }
+            };
+
+            const onDrop = function (source, target) {
+                // Validate and handle the user's move
+                const move = game.move({ from: source, to: target });
+                if (move === null) return 'snapback'; // Invalid move, return the piece to its original position
+                handleUserMove(source, target);
+            };
+
+            const onSnapEnd = function () {
+                board.position(game.fen());
+            };
+
+            const cfg = {
+                draggable: true,
+                position: 'start',
+                onDragStart: onDragStart,
+                onDrop: onDrop,
+                onSnapEnd: onSnapEnd
+            };
+
+            board = Chessboard('board', cfg);
+        }
+
+        // Start a new game
+        function startGame() {
+            game.reset();
+            board.start();
+        }
+
+        // Initialize the chessboard and start a new game
+        initializeChessboard();
+        startGame();
+    </script>
+</body>
+</html>

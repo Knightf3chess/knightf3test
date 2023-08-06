@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Bot Game</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="analytics.css">
+
+    <h1 id="margin">Margin</h1>
+    <style>
+        #piecesBox {
+            width: 400px;
+            height: 100px;
+            border: 1px solid black;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        #piecesBox .piece {
+            display: inline-block;
+            margin-right: 10px;
+            cursor: move;
+        }
+        #fenBox {
+            width: 400px;
+            height: 50px;
+            border: 1px solid black;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="board" style="width: 700px"></div>
+        <div id="fenBox"></div>
+<div id="studio">
+    <div id="studio">
+        <a href="Analyticsstudio.html">
+            <button><center>Studio Mode</center></button>
+        </a>
+    </div>
+    <div>
+        <label for="fenInput">Enter FEN:</label>
+        <input type="text" id="fenInput">
+        <button onclick="setPositionFromFEN()">Set Position</button>
+    </div>
+    
+
+
+    <body>
+        <div class="container">
+          <div class="side-menu">
+            <div class="logo">
+              <img src="https://i.ibb.co/4fh6BkW/fl-conf-ecp013-00017.png" alt="Chess Logo">
+            </div>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="bot.html">Bot</a></li>
+              <li><a href="analytics.html">Analytics</a></li>
+              <li><a href="learn.html">Learn</a></li>
+              <li><a href="vsfriend.html">VS Friend</a></li>
+              <li><a href="News.html">News</a></li>
+              <li><a href="live.html">Live</a></li>
+              <li><a href="streamers.html">Streamers</a></li>
+            </ul>
+    
+</div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="stockfish.js"></script>
+
+    <script>
+        // Initialize the chess board and game objects
+        const board = Chessboard('board', {
+            draggable: true,
+            dropOffBoard: 'trash',
+            sparePieces: true
+        });
+        const game = new Chess();
+        const engine = new Worker('stockfish.js');
+        let engineReady = false;
+        let isPlayerTurn = true;
+
+        // Handle messages from the Stockfish engine
+        engine.onmessage = function (event) {
+            const line = event.data;
+            if (line.startsWith("bestmove")) {
+                const move = line.split(' ')[1];
+                if (move) {
+                    game.move(move, {sloppy: true});
+                    board.position(game.fen());
+                    if (game.in_checkmate()) {
+                        alert('Game over: Checkmate!');
+                    } else if (game.in_draw()) {
+                        alert('Game over: Draw!');
+                    }
+                    isPlayerTurn = true;
+                    updateFEN();
+                }
+            }
+        };
+
+        // Initialize the Stockfish engine
+        function initEngine() {
+            engine.postMessage('uci');
+            engine.postMessage('ucinewgame');
+            engineReady = true;
+        }
+
+        // Make the Stockfish bot play its move
+        function makeBotMove() {
+            if (!engineReady || !isPlayerTurn) {
+                return;
+            }
+            engine.postMessage('position fen ' + game.fen());
+            engine.postMessage('go depth 1');
+        }
+
+        // Start the game
+        function startGame() {
+            initEngine();
+            board.start();
+            board.position(game.fen());
+            makeBotMove();
+            updateFEN();
+        }
+
+        // Stop the current game
+        function stopGame() {
+            engine.terminate();
+        }
+
+        // Update the live FEN
+        function updateFEN() {
+            document.getElementById('fenBox').textContent = 'FEN: ' + game.fen();
+        }
+
+        // Add event listener for page load
+        window.addEventListener('load', startGame);
+
+        // Make the pieces draggable
+        $('#piecesBox .piece').draggable({
+            revert: 'invalid',
+            helper: 'clone',
+            start: function (event, ui) {
+                const piece = $(this).attr('src');
+                ui.helper.css('background-image', `url(${piece})`);
+            }
+        });
+
+        // Make the board squares droppable
+        $('#board .square-55d63').droppable({
+            drop: function (event, ui) {
+                const targetSquare = $(this).data('square');
+                const piece = ui.helper.attr('src');
+                const pieceType = piece.split('/').pop().split('.')[0];
+                const color = pieceType.charAt(0) === 'w' ? 'white' : 'black';
+
+                // Validate the move
+                const move = game.move({
+                    from: ui.helper.data('square'),
+                    to: targetSquare,
+                    promotion: 'q' // always promote to a queen for simplicity
+                });
+
+                if (move === null) {
+                    return;
+                }
+
+                // Update the board
+                board.position(game.fen());
+
+                // Remove the dropped piece from the box
+                ui.helper.remove();
+
+                // Add the dropped piece to the board
+                const draggedPiece = $('<img/>', {
+                    class: 'piece',
+                    src: piece,
+                    'data-square': targetSquare,
+                    'data-piece': pieceType
+                });
+                $(this).append(draggedPiece);
+
+                isPlayerTurn = false; // Switch to the bot's turn
+                makeBotMove();
+                updateFEN();
+            }
+        });
+
+    // Set the board position from FEN input
+function setPositionFromFEN() {
+    const fenInput = document.getElementById('fenInput').value;
+    if (game.load(fenInput)) {
+        board.position(fenInput);
+        updateFEN();
+    } else {
+        alert('Invalid FEN');
+    }
+}
+
+    </script>
+</body>
+</html>

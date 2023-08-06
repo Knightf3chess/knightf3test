@@ -1,0 +1,115 @@
+body {
+    background-image: url(https://images.hdqwalls.com/wallpapers/orange-audi-r8-cd.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+.side-menu {
+    background-color: rgba(0, 10, 31, 0.9);
+    /* Rest of the code */
+  }
+  
+  .side-menu a:hover,
+  .side-menu a.active {
+    background-color: #00ffe5;
+    opacity: 0.5;
+    /* Rest of the code */
+  }
+  
+  
+  
+  .side-menu {
+    height: 80px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 9999;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    animation: slideInDown 0.5s ease-out;
+    animation-fill-mode: both;
+  }
+  
+  @keyframes slideInDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .logo img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .side-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .side-menu li {
+    margin-right: 10px;
+  }
+  
+  .side-menu a {
+    display: block;
+    padding: 8px 16px;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .side-menu a:hover {
+    background-color: #00ffe5;
+  }
+  
+  .side-menu a.active {
+    background-color: #00ffe5;
+    color: #00325a;
+  }
+
+
+.board {
+    width: 700px;
+    margin: auto;
+    margin-top: 100px;
+    background-color: #fff; /* Setting a white background color */
+    padding: 20px; /* Adding padding for better spacing */
+    border-radius: 8px; /* Adding border radius for rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adding a subtle box shadow */
+    color: #111; /* Setting text color to dark gray */
+}
+
+.info {
+    width: 400px;
+    margin: auto;
+    background-color: #fff; /* Setting a white background color */
+    padding: 20px; /* Adding padding for better spacing */
+    border-radius: 8px; /* Adding border radius for rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adding a subtle box shadow */
+    color: #111; /* Setting text color to dark gray */
+}
+
+.move-history {
+    max-height: 100px;
+    overflow-y: scroll;
+    background-color: #fff; /* Setting a white background color */
+    padding: 10px; /* Adding padding for better spacing */
+    border-radius: 8px; /* Adding border radius for rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adding a subtle box shadow */
+    color: #111; /* Setting text color to dark gray */
+}

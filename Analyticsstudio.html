@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Bot Game</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="analytics.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="board" style="width: 700px"></div>
+        <div id="fenBox"></div>
+
+        </div>
+        <button id="takeScreenshot">Take Screenshot</button>
+        <div>
+            <label for="fenInput">Enter FEN:</label>
+            <input type="text" id="fenInput">
+            <button onclick="setPositionFromFEN()">Set Position</button>
+        </div>
+        
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="stockfish.js"></script>
+
+    <script>
+        // Initialize the chess board and game objects
+        const board = Chessboard('board', {
+            draggable: true,
+            position: 'start'
+        });
+        const game = new Chess();
+        const engine = new Worker('stockfish.js');
+        let engineReady = false;
+        let isPlayerTurn = true;
+
+        // Handle messages from the Stockfish engine
+        engine.onmessage = function (event) {
+            const bestMove = event.data.split(' ')[1];
+            if (bestMove && !game.game_over()) {
+                game.move(bestMove, { sloppy: true });
+                board.position(game.fen());
+                if (game.in_checkmate()) {
+                    alert('Game over: Checkmate!');
+                } else if (game.in_draw()) {
+                    alert('Game over: Draw!');
+                }
+                isPlayerTurn = true;
+                updateFEN();
+            }
+        };
+
+        // Initialize the Stockfish engine
+        function initEngine() {
+            engine.postMessage('uci');
+            engine.postMessage('ucinewgame');
+            engineReady = true;
+        }
+
+        // Make the Stockfish bot play its move
+        function makeBotMove() {
+            if (!engineReady || !isPlayerTurn || game.game_over()) {
+                return;
+            }
+            engine.postMessage('position fen ' + game.fen());
+            engine.postMessage('go depth 1');
+        }
+
+        // Start the game
+        function startGame() {
+            initEngine();
+            board.start();
+            board.position(game.fen());
+            makeBotMove();
+            updateFEN();
+        }
+
+        // Update the FEN box
+        function updateFEN() {
+            const fen = game.fen();
+            document.getElementById('fenBox').innerText = 'FEN: ' + fen;
+        }
+
+        // Take a screenshot of the board and download it
+        function takeScreenshot() {
+            html2canvas(document.getElementById('board')).then(canvas => {
+                canvas.toBlob(function (blob) {
+                    saveAs(blob, 'chessboard_screenshot.png');
+                });
+            });
+        }
+
+        // Add event listeners
+        document.getElementById('takeScreenshot').addEventListener('click', takeScreenshot);
+
+        // Add event listener for the player's move
+        board.on('move', function (source, target) {
+            if (isPlayerTurn && !game.game_over()) {
+                const move = game.move({ from: source, to: target });
+                if (move === null) {
+                    return 'snapback';
+                }
+                isPlayerTurn = false;
+                setTimeout(makeBotMove, 250); // Delay for bot move
+                updateFEN();
+            }
+        });
+
+        // Start the game automatically
+        startGame();
+
+        // Set the board position from FEN input
+function setPositionFromFEN() {
+    const fenInput = document.getElementById('fenInput').value;
+    if (game.load(fenInput)) {
+        board.position(fenInput);
+        updateFEN();
+    } else {
+        alert('Invalid FEN');
+    }
+}
+
+    </script>
+</body>
+</html>

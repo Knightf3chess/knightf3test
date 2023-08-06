@@ -1,0 +1,34 @@
+body {
+    background-color: #001f33; /* Setting a dark blue background color */
+   }
+   
+   
+.board {
+   width: 700px;
+   margin: auto;
+   background-color: #001f33; /* Setting a very dark blue background color */
+   padding: 20px; /* Adding padding for better spacing */
+   border-radius: 8px; /* Adding border radius for rounded corners */
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adding a subtle box shadow */
+   color: #fff; /* Setting text color to white for better contrast */
+}
+
+.info {
+   width: 400px;
+   margin: auto;
+   background-color: #001f33; /* Setting a very dark blue background color */
+   padding: 20px; /* Adding padding for better spacing */
+   border-radius: 8px; /* Adding border radius for rounded corners */
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adding a subtle box shadow */
+   color: #fff; /* Setting text color to white for better contrast */
+}
+
+.move-history {
+   max-height: 100px;
+   overflow-y: scroll;
+   background-color: #001f33; /* Setting a very dark blue background color */
+   padding: 10px; /* Adding padding for better spacing */
+   border-radius: 8px; /* Adding border radius for rounded corners */
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adding a subtle box shadow */
+   color: #fff; /* Setting text color to white for better contrast */
+}

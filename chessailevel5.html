@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Bot Game</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="analytics.css">
+</head>
+<body>
+    <div style="margin: 50px;"></div>
+    <div class="container">
+        <div id="board" style="width: 700px"></div>
+        <button id="startGame">New Game</button>
+        <button id="stopGame" disabled>Pause</button>
+        <label>
+            <input type="checkbox" id="blitzMode" checked> Play Fast
+
+            <body>
+                <div class="container">
+                  <div class="side-menu">
+                    <div class="logo">
+                      <img src="https://i.ibb.co/4fh6BkW/fl-conf-ecp013-00017.png" alt="Chess Logo">
+                    </div>
+                    <ul>
+                      <li><a href="index.html">Home</a></li>
+                      <li><a href="bot.html">Bot</a></li>
+                      <li><a href="analytics.html">Analytics</a></li>
+                      <li><a href="learn.html">Learn</a></li>
+                      <li><a href="vsfriend.html">VS Friend</a></li>
+                      <li><a href="News.html">News</a></li>
+                      <li><a href="live.html">Live</a></li>
+                      <li><a href="streamers.html">Streamers</a></li>
+                    </ul>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="stockfish.js"></script>
+    
+    <script>
+        // Initialize the chess board and game objects
+        const board = Chessboard('board', {
+            draggable: true,
+            position: 'start',
+            onDrop: handleUserMove // Call handleUserMove on piece drop
+        });
+        const game = new Chess();
+        const engine = new Worker('stockfish.js');
+        let engineReady = false;
+        
+        let gameInProgress = false;
+        let lastMoveTime = Date.now();
+
+        // Handle messages from the Stockfish engine
+        engine.onmessage = function (event) {
+            const message = event.data;
+            if (message.startsWith('bestmove') && gameInProgress) {
+                const bestMove = message.split(' ')[1];
+                game.move(bestMove, { sloppy: true });
+                board.position(game.fen());
+                if (game.in_checkmate()) {
+                    alert('Game over: Checkmate!');
+                    stopGame();
+                } else if (game.in_draw()) {
+                    alert('Game over: Draw!');
+                    stopGame();
+                }
+                setTimeout(botMove, 500); // Delay before next Stockfish move
+            }
+        };
+
+        // Initialize the Stockfish engine
+        function initEngine() {
+          engine.postMessage('uci');
+          engine.postMessage('ucinewgame');
+          engineReady = true;
+        }
+
+        // Make the Stockfish bot play its move
+        function botMove() {
+            if (!gameInProgress) return;
+            const blitzMode = document.getElementById('blitzMode').checked;
+            const moveTime = blitzMode ? 250 : 500;
+            const currentTime = Date.now();
+            const timeSinceLastMove = currentTime - lastMoveTime;
+            if (timeSinceLastMove >= moveTime && game.turn() === 'b') {
+                engine.postMessage('position fen ' + game.fen());
+                engine.postMessage('go movetime ' + moveTime);
+                lastMoveTime = currentTime;
+            }
+        }
+
+        // Handle user move
+        function handleUserMove(source, target) {
+            const move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q' // Always promote to queen for simplicity
+            });
+
+            if (move === null) return 'snapback';
+
+            board.position(game.fen());
+            if (game.in_checkmate()) {
+                alert('Game over: Checkmate!');
+                stopGame();
+            } else if (game.in_draw()) {
+                alert('Game over: Draw!');
+                stopGame();
+            } else {
+                setTimeout(botMove, 100); // Delay before Stockfish move after user move
+            }
+        }
+
+        // Start a new game
+        function startGame() {
+            game.reset();
+            board.start();
+            gameInProgress = true;
+            document.getElementById('startGame').disabled = true;
+            document.getElementById('stopGame').disabled = false;
+            botMove();
+        }
+
+        // Stop the current game
+        function stopGame() {
+          gameInProgress = false;
+          document.getElementById('startGame').disabled = false;
+          document.getElementById('stopGame').disabled = true;
+          document.getElementById('resumeGame').disabled = false;
+        }
+        
+        // Resume a stopped game
+        function resumeGame() {
+            if (!game.game_over()) {
+                gameInProgress = true;
+                document.getElementById('startGame').disabled = true;
+                document.getElementById('stopGame').disabled = false;
+                document.getElementById('resumeGame').disabled = true;
+                botMove();
+            }
+        }
+
+        // Add event listeners for buttons
+        document.getElementById('startGame').addEventListener('click', startGame);
+        document.getElementById('stopGame').addEventListener('click', stopGame);
+        document.getElementById('resumeGame').addEventListener('click', resumeGame);
+
+        // Initialize the Stockfish engine
+        initEngine();
+    </script>
+    </body>
+</html>
